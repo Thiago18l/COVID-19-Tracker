@@ -5,16 +5,15 @@ import { Line, Bar } from "react-chartjs-2";
 //styles
 import styles from "./Chart.module.css";
 
-const Chart = () => {
+const Chart = ({ data: { confirmed, recovered, deaths }, country }) => {
   const [dailyData, setDailyData] = useState([]);
 
   useEffect(() => {
     const fetchAPI = async () => {
       setDailyData(await fetchDailyData());
     };
-    console.log(dailyData);
     fetchAPI();
-  });
+  }, []);
 
   const lineChart = (
     dailyData.length ? (
@@ -23,8 +22,8 @@ const Chart = () => {
           labels: dailyData.map(({ date }) => date),
           datasets: [{
             data: dailyData.map((data) => data.confirmed),
-            label: 'Infected',
-            borderColor: '#3333ff',
+            label: 'Infectados',
+            borderColor: '#02e7c1',
             fill: true,
           }, {
             data: dailyData.map((data) => data.deaths),
@@ -38,9 +37,34 @@ const Chart = () => {
       />
     ) : null
   );
+
+  const barChart = (
+    confirmed
+      ? (
+        <Bar 
+        data={{
+          labels: ['Infectados', 'Recuperados', 'Mortos'],
+          datasets: [{
+            label: 'Pessoas',
+            backgroundColor:[
+              'rgba(2, 231, 193, 0.5)',
+              'rgba(0 , 255, 0, 0.5)',         
+              'rgba(255, 0, 0, 0.5)',
+            ],
+            data: [ confirmed.value, recovered.value, deaths.value]
+          }]
+        }}
+        options={{
+          legend: { display: false },
+          title: { display: true, text: `Estado atual no ${country}` },
+
+        }}
+        />
+      ) : null
+  )
   return (
   <div className={styles.container}>
-      {lineChart}
+      { country ?  barChart : lineChart }
   </div>
   )
 };
